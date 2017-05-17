@@ -25,8 +25,10 @@ class AlterField(object):
         fields = [f.name for f in arcpy.ListFields(fc)]
         #print('list of field names generated')
         #
-        getYear = fc[4:8]
         n = 0
+        #
+        # if getYear is not needed comment out line 31, and remove variable/{value} from line 48
+        getYear = fc[4:8]
         # open the csv file for read mode
         with open(csvFile, 'r') as csvfile:
             # skip the header of the columns
