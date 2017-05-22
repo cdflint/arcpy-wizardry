@@ -5,7 +5,7 @@
 ---
           To automate the task of altering fields, aliases or field props.
 
-#### CalcField
+#### autoIncrement
 ---
 `Note:` Improvements on ESRI's autoIncrement function outlined [here](http://support.esri.com/technical-article/000011137)
 

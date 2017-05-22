@@ -1,4 +1,4 @@
-### CalcField.py
+### autoIncrement.py
 ---
         requires four command line args
         -w or --workspace
@@ -10,7 +10,7 @@
 
 ###### sample run
 ```
-python CalcField.py -w path\to\Data.gdb -s name-of-shapefile -f fieldName -p STRING
+python autoIncrement.py -w path\to\Data.gdb -s name-of-shapefile -f fieldName -p STRING
 ```
 
 ### mindPalace.tbx
