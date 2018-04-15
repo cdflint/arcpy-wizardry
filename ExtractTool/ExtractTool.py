@@ -4,9 +4,26 @@
 
 __author__ = "Carl Flint"
 
+# Copyright 2017 Carl Flint
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import argparse
-import os, time
-import zipfile, tarfile
+import zipfile
+import tarfile
+import time
+import os
+
 
 # Save file in C:\python27\ArcgisX.X
 #
@@ -18,42 +35,36 @@ import zipfile, tarfile
 
 class ExtractTool(object):
 
-    def _findFiles(self, pathDir, tag):
-        self.pathDir = pathDir
-        self.tag = tag
+    def _findFiles(self):
         findList = []
-        for root, dirs, files in os.walk(pathDir):
+        for root, dirs, files in os.walk(self.root):
             for file in files:
-                if file.endswith(tag):
-                    #print(os.path.join(root, file))
+                if file.endswith(self.ext):
                     foundFile = os.path.join(root, file)
                     findList.append(foundFile)
                     print(foundFile)
             return findList
 
-    def _extractZip(self, fileList, targetDir):
-        self.fileList = fileList
-        self.targetDir = targetDir
-        for xFile in fileList:
+    def _extractZip(self):
+        for xFile in self.fileList:
             with zipfile.ZipFile(xFile,'r') as zipf:
-                zipf.extractall(targetDir)
+                zipf.extractall(self.output)
 
-    def _extractTar(self, fileList, targetDir):
-        self.fileList = fileList
-        for xFile in fileList:
+    def _extractTar(self):
+        for xFile in self.fileList:
             with tarfile.open(xFile) as tar:
-                tar.extractall(targetDir)
+                tar.extractall(self.output)
 
     def make(self, args):
         self.root = args.root
         self.output = args.output
         self.ext = args.ext
         print('Reading directory {} \nFor files with extension {}'.format(self.root, self.ext))
-        outList = self._findFiles(self.root, self.ext)
+        self.fileList = self._findFiles()
         if self.ext == ".zip":
-            self._extractZip(outList, self.output)
+            self._extractZip()
         elif self.ext == ".tar.gz" or self.ext == ".tar.bz2":
-            self._extractTar(outList, self.output)
+            self._extractTar()
         else:
             print("Desired compression format not recognized")
         print('Writing output to {} '.format(self.output))

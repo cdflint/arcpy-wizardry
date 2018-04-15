@@ -4,8 +4,24 @@
 
 __author__  = "Carl Flint"
 
-import arcpy, argparse
-import os, time, csv
+# Copyright 2017 Carl Flint
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import argparse
+import arcpy
+import time
+import csv
 
 # Save file in C:\python27\ArcgisX.X
 #
@@ -17,20 +33,18 @@ import os, time, csv
 
 class AlterField(object):
 
-    def _recursive(self, workspace, shapefile, csvFile):
-        fc = shapefile
-        csvFile = csvFile
-        arcpy.env.workspace = workspace
+    def _recursive(self):
+        arcpy.env.workspace = self.workspace
         # generate a list of filed names from the feature class
-        fields = [f.name for f in arcpy.ListFields(fc)]
+        fields = [f.name for f in arcpy.ListFields(self.shapefile)]
         #print('list of field names generated')
         #
         n = 0
         #
         # if getYear is not needed comment out line 31, and remove variable/{value} from line 48
-        getYear = fc[4:8]
+        getYear = self.shapefile[4:8]
         # open the csv file for read mode
-        with open(csvFile, 'r') as csvfile:
+        with open(self.csv, 'r') as csvfile:
             # skip the header of the columns
             #header = next(csv.reader(csvfile))
             # define csv reader
@@ -46,7 +60,7 @@ class AlterField(object):
                     # confirm the change is taking place
                     n += 1
                     print('changing field name of {0} to a new alias of {1} {2}'.format(field, getYear, alias))
-                    arcpy.AlterField_management(fc, field, field, getYear +' '+ alias)
+                    arcpy.AlterField_management(self.shapefile, field, field, getYear +' '+ alias)
                     print('fields changed: {0}'.format(n))
                     # break
 
@@ -56,7 +70,7 @@ class AlterField(object):
         self.csv = args.csv
         print('reading {0} from directory {1}'.format(self.shapefile, self.workspace))
         print('using lookup table {0}'.format(self.csv))
-        self._recursive(self.workspace, self.shapefile, self.csv)
+        self._recursive()
 
 if __name__ == "__main__":
     # start global clock

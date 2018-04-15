@@ -4,8 +4,23 @@
 
 __author__  = "Carl Flint"
 
-import arcpy, argparse
-import os, time, csv
+# Copyright 2017 Carl Flint
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import argparse
+import arcpy
+import time
 
 # Save file in C:\python27\ArcgisX.X
 #
@@ -17,24 +32,20 @@ import os, time, csv
 
 class CalcField(object):
 
-    def _autoIncrement(self, workspace, shapefile, fieldList, startVal, prefixString):
-        fc = shapefile
-        updatefields = fieldList
-        arcpy.env.workspace = workspace
-        prefix = prefixString
-        #print(prefixString)
+    def _autoIncrement(self):
+        arcpy.env.workspace = self.workspace
         # get a count of rows in the feature class
-        numberRows = arcpy.GetCount_management(fc)
+        numberRows = arcpy.GetCount_management(self.shapefile)
         # get the length of the row count
         depth = int(len(numberRows.getOutput(0)))
         #print(depth)
-        startVal = int(startVal)
+        startVal = int(self.startVal)
         #print(startVal)
-        x = ('{0}-{1:0{2}d}'.format(prefix,startVal,depth))
-        print('Updating field/s {0} with autoIncrement values formatted as {1}'.format(updatefields, x))
+        x = ('{0}-{1:0{2}d}'.format(self.prefixString,startVal,depth))
+        print('Updating field/s {0} with autoIncrement values formatted as {1}'.format(self.fieldList, x))
         # define core requirements of arcpy.CalculateField_management
         py = "PYTHON"
-        expression = "autoIncrement({0},'{1}',{2})".format(startVal,prefix,depth)
+        expression = "autoIncrement({0},'{1}',{2})".format(startVal,self.prefixString,depth)
         # the code block looks like it should throw a python tab space error but its a multiline text block
         codeBlock = """
 rec = 0
@@ -49,7 +60,7 @@ def autoIncrement(startValue, prefix, fieldDepth):
     return "{0}-{1:0{2}d}".format(prefix,rec,fieldDepth)"""
         # run to the hills
         # note some issues may be a result of lockfiles check to ensure all lockfiles are gone
-        arcpy.CalculateField_management(fc, updatefields, expression, py, codeBlock)
+        arcpy.CalculateField_management(self.shapefile, self.fieldList, expression, py, codeBlock)
 
     def make(self, args):
         self.workspace = args.workspace
@@ -58,7 +69,7 @@ def autoIncrement(startValue, prefix, fieldDepth):
         self.startVal = args.startVal
         self.prefixString = args.prefixString
         print('reading {0} from directory {1}'.format(self.shapefile, self.workspace))
-        self._autoIncrement(self.workspace, self.shapefile, self.fieldList, self.startVal, self.prefixString)
+        self._autoIncrement()
 
 if __name__ == "__main__":
     # start global clock
